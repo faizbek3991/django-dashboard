@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🔐 Login</title>
+    <style>
+        :root {
+            --bg-main: #0d1b2a;
+            --bg-card: #172a44;
+            --bg-input: #0f1b33;
+            --border-color: #2f4f76;
+            --text-primary: white;
+            --text-secondary: #cfd8dc;
+            --text-muted: #90a4ae;
+            --primary-color: #4fc3f7;
+            --success-color: #00c97b;
+            --success-hover: #04b06f;
+            --error-color: #ff6b6b;
+        }
+        
+        body.light-theme {
+            --bg-main: #f5f5f5;
+            --bg-card: #ffffff;
+            --bg-input: #fafafa;
+            --border-color: #e0e0e0;
+            --text-primary: #2d2d2d;
+            --text-secondary: #555555;
+            --text-muted: #888888;
+            --primary-color: #0277bd;
+            --error-color: #d32f2f;
+        }
+        
+        body { font-family: Arial, sans-serif; background: var(--bg-main); color: var(--text-primary);
+               display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;
+               transition: background 0.3s ease; }
+        
+        .theme-toggle { position: absolute; top: 20px; right: 20px; }
+        .theme-toggle button { background: var(--primary-color); border: none; border-radius: 50%;
+                               width: 50px; height: 50px; cursor: pointer; font-size: 24px;
+                               display: flex; align-items: center; justify-content: center;
+                               box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
+        .theme-toggle button:hover { opacity: 0.8; }
+        
+        .login-card { background: var(--bg-card); padding: 38px 32px; border-radius: 18px;
+                      width: 380px; max-width: 92vw; box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+                      transition: background 0.3s ease; }
+        .login-card h1 { margin: 0 0 24px; color: var(--primary-color); text-align: center; }
+        .login-card form { display: grid; gap: 16px; }
+        label { display: block; color: var(--text-secondary); font-size: 14px; }
+        input { width: 100%; padding: 14px 16px; border: 1px solid var(--border-color);
+                border-radius: 12px; background: var(--bg-input); color: var(--text-primary);
+                box-sizing: border-box; transition: all 0.3s ease; }
+        input:focus { outline: none; border-color: var(--primary-color); }
+        button[type="submit"] { width: 100%; padding: 14px 16px; border: none; border-radius: 12px;
+                                background: var(--success-color); color: #07241a; font-weight: bold;
+                                cursor: pointer; transition: background 0.3s ease; }
+        button[type="submit"]:hover { background: var(--success-hover); }
+        .error { color: var(--error-color); margin: 0 0 10px; }
+        .hint { color: var(--text-muted); font-size: 13px; margin-top: 18px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle">
+        <button id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    </div>
+    
+    <div class="login-card">
+        <h1>Dashboard Login</h1>
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" required>
+
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" required>
+
+            <button type="submit">Sign in</button>
+        </form>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeBtn');
+            const isDark = body.classList.contains('light-theme');
+            
+            if (isDark) {
+                body.classList.remove('light-theme');
+                btn.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.add('light-theme');
+                btn.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Load saved theme on page load
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('theme');
+            const btn = document.getElementById('themeBtn');
+            if (saved === 'light') {
+                document.body.classList.add('light-theme');
+                btn.textContent = '☀️';
+            }
+        });
+    </script>
+</body>
+</html>

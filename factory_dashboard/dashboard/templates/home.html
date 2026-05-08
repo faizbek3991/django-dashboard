@@ -1,0 +1,113 @@
+<!-- File: dashboard/templates/home.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🏭 {{ title }}</title>
+    <style>
+        :root {
+            --bg-main: #0d1b2a;
+            --bg-card: #1b2a4a;
+            --text-primary: white;
+            --text-secondary: #ccc;
+            --accent-color: #009ddc;
+            --success-color: #00c97b;
+        }
+        body.light-theme {
+            --bg-main: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #2d2d2d;
+            --text-secondary: #666666;
+            --accent-color: #0277bd;
+            --success-color: #2e7d32;
+        }
+        body { font-family: Arial; background: var(--bg-main);
+               color: var(--text-primary); padding: 20px; transition: background 0.3s ease; }
+        .theme-toggle { position: absolute; top: 20px; right: 20px; }
+        .theme-toggle button { background: var(--accent-color); border: none; border-radius: 50%;
+                               width: 50px; height: 50px; cursor: pointer; font-size: 24px;
+                               display: flex; align-items: center; justify-content: center;
+                               box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
+        .theme-toggle button:hover { opacity: 0.8; }
+        .kpi-grid { display: grid;
+            grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .kpi-card { background: var(--bg-card); padding: 20px;
+            border-radius: 10px; text-align: center;
+            border-left: 4px solid var(--success-color); color: var(--text-primary); }
+        .kpi-value { font-size: 36px; font-weight: bold;
+                     color: var(--success-color); }
+        .kpi-label { font-size: 14px; color: var(--text-secondary); }
+        h1 { color: var(--accent-color); }
+        nav a { color: var(--accent-color); margin: 0 15px;
+                text-decoration: none; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle">
+        <button id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    </div>
+    <h1>🏭 {{ title }}</h1>
+    {% if username %}
+    <p style="color:#a2d5f2; margin-bottom: 10px;">Welcome, {{ username }}.</p>
+    {% endif %}
+    <nav>
+        <a href="/">📊 Dashboard</a>
+        <a href="/data/">📂 Data</a>
+        <a href="/charts/">📈 Charts</a>
+        <a href="/predict/">🤖 Predict</a>
+        {% if username %}
+            <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0;">
+                {% csrf_token %}
+                <button type="submit" style="background:#ff5c5c; color:white; border:none; border-radius:10px; padding:8px 14px; cursor:pointer; font-size:14px;">🚪 Logout</button>
+            </form>
+        {% endif %}
+    </nav>
+    <hr>
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-value">{{ total_output }}</div>
+            <div class="kpi-label">Total Output (units)</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">{{ avg_oee }}%</div>
+            <div class="kpi-label">Average OEE</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">{{ defect_rate }}%</div>
+            <div class="kpi-label">Defect Rate</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">
+                {{ machines_online }}/{{ total_machines }}
+            </div>
+            <div class="kpi-label">Machines Online</div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeBtn');
+            const isDark = body.classList.contains('light-theme');
+            
+            if (isDark) {
+                body.classList.remove('light-theme');
+                btn.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.add('light-theme');
+                btn.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('theme');
+            const btn = document.getElementById('themeBtn');
+            if (saved === 'light') {
+                document.body.classList.add('light-theme');
+                btn.textContent = '☀️';
+            }
+        });
+    </script>
+</body>
+</html>

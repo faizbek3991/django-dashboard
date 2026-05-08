@@ -1,0 +1,126 @@
+<!-- File: dashboard/templates/predict.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🤖 {{ title }}</title>
+    <style>
+        :root {
+            --bg-main: #0d1b2a;
+            --bg-card: #1b2a4a;
+            --text-primary: white;
+            --text-secondary: #ccc;
+            --accent-color: #009ddc;
+            --accent-hover: #007bb5;
+            --input-bg: #0d1b2a;
+        }
+        body.light-theme {
+            --bg-main: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #2d2d2d;
+            --text-secondary: #666666;
+            --accent-color: #0277bd;
+            --accent-hover: #1565c0;
+            --input-bg: #fafafa;
+        }
+        body { font-family: Arial; background: var(--bg-main);
+               color: var(--text-primary); padding: 20px; transition: background 0.3s ease; }
+        .theme-toggle { position: absolute; top: 20px; right: 20px; }
+        .theme-toggle button { background: var(--accent-color); border: none; border-radius: 50%;
+                               width: 50px; height: 50px; cursor: pointer; font-size: 24px;
+                               display: flex; align-items: center; justify-content: center;
+                               box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
+        .theme-toggle button:hover { opacity: 0.8; }
+        h1 { color: var(--accent-color); }
+        nav a { color: var(--accent-color); margin: 0 15px;
+                text-decoration: none; }
+        form { background: var(--bg-card); padding: 25px;
+               border-radius: 10px; max-width: 500px; color: var(--text-primary); }
+        label { display: block; margin: 10px 0 5px;
+                color: var(--text-secondary); }
+        input { width: 100%; padding: 10px; border: none;
+                border-radius: 5px; background: var(--input-bg);
+                color: var(--text-primary); font-size: 16px;
+                border: 1px solid var(--accent-color); }
+        button[type="submit"] { background: var(--accent-color); color: white;
+                 padding: 12px 30px; border: none;
+                 border-radius: 5px; font-size: 16px;
+                 cursor: pointer; margin-top: 15px; }
+        button[type="submit"]:hover { background: var(--accent-hover); }
+        .result { background: var(--bg-card); padding: 20px; color: var(--text-primary);
+                  border-radius: 10px; margin-top: 20px;
+                  max-width: 500px; text-align: center; }
+        .result-value { font-size: 48px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle">
+        <button id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    </div>
+    <h1>🤖 Defect Rate Prediction</h1>
+    <nav>
+        <a href="/">📊 Dashboard</a>
+        <a href="/data/">📂 Data</a>
+        <a href="/charts/">📈 Charts</a>
+        <a href="/predict/">🤖 Predict</a>
+        {% if username %}
+            <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0;">
+                {% csrf_token %}
+                <button type="submit" style="background:#ff5c5c; color:white; border:none; border-radius:10px; padding:8px 14px; cursor:pointer; font-size:14px;">🚪 Logout</button>
+            </form>
+        {% endif %}
+    </nav><hr>
+ 
+    <form method="POST">
+        {% csrf_token %}
+        <label>🌡️ Temperature (°C):</label>
+        <input type="number" name="temperature" value="30" step="0.1">
+        <label>💧 Humidity (%):</label>
+        <input type="number" name="humidity" value="60" step="0.1">
+        <label>⚙️ Machine Age (years):</label>
+        <input type="number" name="machine_age" value="5" step="0.1">
+        <label>🔧 Speed (RPM):</label>
+        <input type="number" name="speed" value="1200" step="1">
+        <label>📳 Vibration (mm/s):</label>
+        <input type="number" name="vibration" value="2.0" step="0.1">
+        <button type="submit">🔮 Predict Defect Rate</button>
+    </form>
+ 
+    {% if prediction %}
+    <div class="result">
+        <div class="result-value"
+             style="color: {{ risk_level.1 }}">
+            {{ prediction }}%
+        </div>
+        <div style="font-size: 24px;">
+            {{ risk_level.0 }}
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeBtn');
+            const isDark = body.classList.contains('light-theme');
+            
+            if (isDark) {
+                body.classList.remove('light-theme');
+                btn.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.add('light-theme');
+                btn.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('theme');
+            const btn = document.getElementById('themeBtn');
+            if (saved === 'light') {
+                document.body.classList.add('light-theme');
+                btn.textContent = '☀️';
+            }
+        });
+    </script>
+</body></html>
